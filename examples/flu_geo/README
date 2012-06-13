@@ -1,0 +1,3 @@
+unzip 21424.zip
+ogr2ogr -f GeoJSON states.json usa_state_shapefile.shp
+python join.py states.json 2011_states.csv out.json

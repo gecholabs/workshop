@@ -1,0 +1,61 @@
+<!DOCTYPE html>  
+<html> 
+  <head>
+    <title>D3 Graph</title>
+    <script type="text/javascript" src="jquery-1.7.1.min.js"></script>
+    <script type="text/javascript" src="jquery.hotkeys.js"></script>
+    <script type="text/javascript" src="jquery.mousewheel.js"></script>
+    <script type="text/javascript" src="d3.v2.min.js"></script>
+    <script type="text/javascript">
+      function as_rgb (c) {
+        return 'rgb(' + c[0] + ',' + c[1] + ',' + c[2] + ')';
+      };
+      var order = ['1/2/2011', '1/9/2011', '1/16/2011', '1/23/2011', '1/30/2011', '2/6/2011', '2/13/2011', '2/20/2011', '2/27/2011', '3/6/2011', '3/13/2011', '3/20/2011', '3/27/2011', '4/3/2011', '4/10/2011', '4/17/2011', '4/24/2011', '5/1/2011', '5/8/2011', '5/15/2011', '5/22/2011', '5/29/2011', '6/5/2011', '6/12/2011', '6/19/2011', '6/26/2011', '7/3/2011', '7/10/2011', '7/17/2011', '7/24/2011', '7/31/2011', '8/7/2011', '8/14/2011', '8/21/2011', '8/28/2011', '9/4/2011', '9/11/2011', '9/18/2011', '9/25/2011', '10/2/2011', '10/9/2011', '10/16/2011', '10/23/2011', '10/30/2011', '11/6/2011', '11/13/2011', '11/20/2011', '11/27/2011', '12/4/2011', '12/11/2011', '12/18/2011', '12/25/2011'];
+      var red_blue = [
+	[178, 24, 43, 255],
+        [239, 138, 98, 255],
+        [253, 219, 199, 255],
+        [209, 169, 207, 255],
+        [103, 169, 207, 255],
+        [33, 102, 172, 255],
+      ];
+      $ (document).ready (function () {
+        $.ajax ({
+          url: '2011.json',
+          dataType: 'json',
+          success: function (data) {
+            data.features.sort (function (a, b) {
+                return a.properties[order[0]] - b.properties[order[0]];
+            });
+            $.each (data.features, function (index, value) {
+                value.id = index;
+            });
+            var svg = d3.select (container).append ('svg')
+	      .style ('width', 800)
+              .style ('height', 600);
+            var xmap = d3.scale.linear ().domain ([0, 51]).range ([0, 800]);
+            var ymap = d3.scale.linear ().domain ([0, 12000]).range ([600, 0]);
+            svg.selectAll ('line').data (data.features).enter ().append ('path')
+              .attr ('d', function (d) {
+                var pos = [];
+                $.each (order, function (index, key) {
+         	  pos.push (' L ' + xmap (index) + ' ' + ymap (d.properties[key]));
+                });
+                return 'M ' + xmap (0) + ' ' + ymap (d.properties[order[0]]) +  pos.join ('');
+              })
+              .style ('fill', 'none')
+              .style ('stroke', function (d) {
+                var index = Math.floor ((d.id / (data.features.length + 1)) * red_blue.length);
+                return as_rgb (red_blue[index]);
+              })
+              .style ('stroke-width', 1.5);
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div id="container">
+    </div>
+  </body>
+</html>

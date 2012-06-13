@@ -1,0 +1,2 @@
+unzip 
+ogr2ogr -f GeoJSON states.json usa_state_shapefile.shp
